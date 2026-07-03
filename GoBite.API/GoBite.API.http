@@ -1,0 +1,6 @@
+@GoBite.API_HostAddress = http://localhost:5001
+
+GET {{GoBite.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
