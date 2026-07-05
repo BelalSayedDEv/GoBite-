@@ -1,7 +1,10 @@
+﻿using GoBite.Domain.CartEntities;
+using GoBite.Domain.CommentEntities;
+using GoBite.Domain.NotificationُEntities;
+using GoBite.Domain.OrderEntities;
 using Microsoft.AspNetCore.Identity;
 
 namespace GoBite.Domain.Entities;
-
 public class ApplicationUser : IdentityUser
 {
     public string FirstName { get; set; } = string.Empty;
@@ -10,4 +13,10 @@ public class ApplicationUser : IdentityUser
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
+    public Cart Cart { get; set; } = null!;
+
+    public ICollection<Order> Orders { get; set; } = new List<Order>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }

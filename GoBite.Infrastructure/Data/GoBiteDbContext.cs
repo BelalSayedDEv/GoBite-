@@ -1,4 +1,5 @@
 using GoBite.Domain.Entities;
+using GoBite.Infrastructure.Data.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,35 +14,28 @@ public class GoBiteDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<OtpCode> OtpCodes => Set<OtpCode>();
 
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<RefreshToken>(entity =>
-        {
-            entity.ToTable("RefreshTokens");
-            entity.HasKey(rt => rt.Id);
-            entity.Property(rt => rt.Token).HasMaxLength(256).IsRequired();
-            entity.Property(rt => rt.JwtId).HasMaxLength(128).IsRequired();
-            entity.Property(rt => rt.UserId).IsRequired();
-            entity.HasIndex(rt => rt.Token);
-            entity.HasOne(rt => rt.User)
-                  .WithMany()
-                  .HasForeignKey(rt => rt.UserId)
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        builder.Entity<OtpCode>(entity =>
-        {
-            entity.ToTable("OtpCodes");
-            entity.HasKey(o => o.Id);
-            entity.Property(o => o.Code).HasMaxLength(6).IsRequired();
-            entity.Property(o => o.UserId).IsRequired();
-            entity.HasIndex(o => new { o.UserId, o.Code });
-            entity.HasOne(o => o.User)
-                  .WithMany()
-                  .HasForeignKey(o => o.UserId)
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
+        builder.ApplyConfigurationsFromAssembly(typeof(AddonConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(CategoryConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(IngredientsConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(InventoryConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(AddonConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(OtpCodeConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(ProductAddonConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(ProductConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(ProductIngredientCofiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(RefreshTokenConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(CartItemConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(CartItemAddonConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(CartItemInfrediantsRemovedConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(OrderItemConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(OrderItemIngredientConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(OrderItemAddonConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(NotificationConfiguration).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(CommentConfiguration).Assembly);
     }
 }

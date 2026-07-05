@@ -49,6 +49,7 @@ public class AuthController : ControllerBase
 
 
 
+    [Authorize]
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh(RefreshTokenRequest request)
     {
