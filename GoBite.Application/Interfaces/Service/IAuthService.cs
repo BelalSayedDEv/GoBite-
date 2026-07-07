@@ -1,7 +1,7 @@
 using GoBite.Application.Contracts;
 using GoBite.Application.DTOs.Auth;
 
-namespace GoBite.Application.Interfaces;
+namespace GoBite.Application.Interfaces.Service;
 
 public interface IAuthService
 {

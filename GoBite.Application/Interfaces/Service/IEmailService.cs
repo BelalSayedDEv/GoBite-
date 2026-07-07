@@ -1,4 +1,4 @@
-namespace GoBite.Application.Interfaces;
+namespace GoBite.Application.Interfaces.Service;
 
 public interface IEmailService
 {

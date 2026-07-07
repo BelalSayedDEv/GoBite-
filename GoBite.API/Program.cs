@@ -1,14 +1,17 @@
-using System.Text;
-using GoBite.Application.Interfaces;
+using GoBite.Application.Interfaces.Rrepository;
+using GoBite.Application.Interfaces.Service;
 using GoBite.Application.Services;
+using GoBite.Application.UnitOfWork;
 using GoBite.Domain.Entities;
 using GoBite.Infrastructure.Data;
 using GoBite.Infrastructure.Repositories;
 using GoBite.Infrastructure.Services;
+using GoBite.Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +67,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(GoBite.Presentation.Controllers.AuthController).Assembly);

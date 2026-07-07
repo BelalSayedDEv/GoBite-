@@ -1,4 +1,4 @@
-using GoBite.Application.Interfaces;
+using GoBite.Application.Interfaces.Service;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;

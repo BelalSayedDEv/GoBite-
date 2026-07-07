@@ -1,4 +1,4 @@
-using GoBite.Application.Interfaces;
+using GoBite.Application.Interfaces.Rrepository;
 using GoBite.Domain.Entities;
 using GoBite.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

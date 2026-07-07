@@ -1,6 +1,6 @@
 using GoBite.Domain.Entities;
 
-namespace GoBite.Application.Interfaces;
+namespace GoBite.Application.Interfaces.Rrepository;
 
 public interface IAuthRepository
 {

@@ -1,6 +1,6 @@
 using GoBite.Application.Contracts;
 using GoBite.Application.DTOs.Auth;
-using GoBite.Application.Interfaces;
+using GoBite.Application.Interfaces.Service;
 using GoBite.Presentation.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
