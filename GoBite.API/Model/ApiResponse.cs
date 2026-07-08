@@ -1,4 +1,4 @@
-namespace GoBite.Presentation.Model;
+namespace GoBite.API.Model;
 
 public class ApiResponse<T>
 {

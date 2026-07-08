@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GoBite.Infrastructure\GoBite.Infrastructure.csproj" />
-    <ProjectReference Include="..\GoBite.Presentation\GoBite.Presentation.csproj" />
   </ItemGroup>
 
 </Project>

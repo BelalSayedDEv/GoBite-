@@ -1,3 +1,4 @@
+using GoBite.API.Model;
 using GoBite.Application.Contracts;
 using GoBite.Application.DTOs.Auth;
 using GoBite.Application.Interfaces.Service;
