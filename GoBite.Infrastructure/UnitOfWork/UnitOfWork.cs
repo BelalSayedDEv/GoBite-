@@ -10,14 +10,15 @@ namespace GoBite.Infrastructure.UnitOfWork
 
         public ICartRepository Cart { get; }
 
+        public ICartItemRepository CartItem { get; }
 
 
-
-        public UnitOfWork(GoBiteDbContext context, ICartRepository Cart)
+        public UnitOfWork(GoBiteDbContext context, ICartRepository Cart, ICartItemRepository cartItem)
         {
             this.context = context;
 
             this.Cart = Cart;
+            CartItem = cartItem;
         }
         public async Task SaveAsync()
         {

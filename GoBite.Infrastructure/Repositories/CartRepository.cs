@@ -18,7 +18,7 @@ namespace GoBite.Infrastructure.Repositories
             await context.Carts.AddAsync(cart);
         }
 
-        public async Task<Cart> GetCartByUserId(string UserId)
+        public async Task<Cart?> GetCartByUserId(string UserId)
         {
             return await context.Carts.FirstOrDefaultAsync(c => c.UserId == UserId);
         }

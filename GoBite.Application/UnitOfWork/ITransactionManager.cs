@@ -1,0 +1,10 @@
+﻿namespace GoBite.Application.UnitOfWork
+{
+    public interface ITransactionManager
+    {
+        Task BeginTransactionAsync(CancellationToken cancellationToken = default);
+        Task CommitAsync(CancellationToken cancellationToken = default);
+        Task RollbackAsync(CancellationToken cancellationToken = default);
+
+    }
+}

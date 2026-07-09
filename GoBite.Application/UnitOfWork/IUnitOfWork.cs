@@ -4,8 +4,8 @@ namespace GoBite.Application.UnitOfWork
 {
     public interface IUnitOfWork
     {
-        ICartRepository Cart { get; }
-
+        public ICartRepository Cart { get; }
+        public ICartItemRepository CartItem { get; }
         public Task SaveAsync();
     }
 }
