@@ -1,0 +1,321 @@
+Table AspNetUsers {
+  Id varchar(450) [pk]
+  FirstName varchar
+  LastName varchar
+  ProfileImageUrl varchar [null]
+  IsActive boolean
+  CreatedAt datetime
+  UpdatedAt datetime [null]
+  UserName varchar(256) [null]
+  NormalizedUserName varchar(256) [null]
+  Email varchar(256) [null]
+  NormalizedEmail varchar(256) [null]
+  EmailConfirmed boolean
+  PasswordHash varchar [null]
+  SecurityStamp varchar [null]
+  ConcurrencyStamp varchar [null]
+  PhoneNumber varchar [null]
+  PhoneNumberConfirmed boolean
+  TwoFactorEnabled boolean
+  LockoutEnd datetime [null]
+  LockoutEnabled boolean
+  AccessFailedCount int
+}
+
+Table AspNetRoles {
+  Id varchar(450) [pk]
+  Name varchar(256) [null]
+  NormalizedName varchar(256) [null]
+  ConcurrencyStamp varchar [null]
+}
+
+Table AspNetRoleClaims {
+  Id int [pk]
+  RoleId varchar(450) [not null]
+  ClaimType varchar [null]
+  ClaimValue varchar [null]
+}
+
+Table AspNetUserClaims {
+  Id int [pk]
+  UserId varchar(450) [not null]
+  ClaimType varchar [null]
+  ClaimValue varchar [null]
+}
+
+Table AspNetUserLogins {
+  LoginProvider varchar(450) [pk]
+  ProviderKey varchar(450) [pk]
+  ProviderDisplayName varchar [null]
+  UserId varchar(450) [not null]
+}
+
+Table AspNetUserRoles {
+  UserId varchar(450) [pk]
+  RoleId varchar(450) [pk]
+}
+
+Table AspNetUserTokens {
+  UserId varchar(450) [pk]
+  LoginProvider varchar(450) [pk]
+  Name varchar(450) [pk]
+  Value varchar [null]
+}
+
+Table RefreshTokens {
+  Id int [pk]
+  UserId varchar(450) [not null]
+  Token varchar(256)
+  JwtId varchar(128)
+  IsUsed boolean
+  IsRevoked boolean
+  ExpiresAt datetime
+  CreatedAt datetime
+}
+
+Table OtpCodes {
+  Id int [pk]
+  UserId varchar(450) [not null]
+  Code varchar(6)
+  ResetToken varchar [null]
+  IsUsed boolean
+  ExpiresAt datetime
+  CreatedAt datetime
+}
+
+Table Carts {
+  Id int [pk]
+  UserId varchar(450) [not null]
+  CreatedAt datetime
+  UpdatedAt datetime
+}
+
+Table CartItems {
+  Id int [pk]
+  CartId int [not null]
+  ProductId int [not null]
+  Quantity int
+  SpecialInstructions varchar(1000) [null]
+  CreatedAt datetime
+}
+
+Table CartItemAddons {
+  Id int [pk]
+  CartItemId int [not null]
+  ProductAddonId int [not null]
+  Quantity int
+  CreatedAt datetime
+}
+
+Table CartItemRemovedIngredients {
+  Id int [pk]
+  CartItemId int [not null]
+  IngredientId int [not null]
+  CreatedAt datetime
+}
+
+Table Comments {
+  Id int [pk]
+  Description varchar(1000)
+  UserId varchar(450) [not null]
+  ProductId int [not null]
+  CreatedAt datetime
+  UpdatedAt datetime [null]
+}
+
+Table Categories {
+  Id int [pk]
+  Name varchar(100)
+  ImageUrl varchar(500) [null]
+  DisplayOrder int
+  IsActive boolean
+  CreatedAt datetime
+}
+
+Table Products {
+  Id int [pk]
+  BranchId int [null]
+  CategoryId int [not null]
+  Name varchar(200)
+  Description varchar(2000) [null]
+  BasePrice decimal(18,2)
+  ImageUrl varchar(1000) [null]
+  IsAvailable boolean
+  IsActive boolean
+  CreatedAt datetime
+  UpdatedAt datetime
+}
+
+Table Ingredients {
+  Id int [pk]
+  Name varchar(100)
+  Description varchar(1000) [null]
+  DisplayOrder int
+  IsActive boolean
+  CreatedAt datetime
+}
+
+Table Addons {
+  Id int [pk]
+  Name varchar(100)
+  Description varchar(1000) [null]
+  IsActive boolean
+  CreatedAt datetime
+}
+
+Table ProductIngredients {
+  Id int [pk]
+  ProductId int [not null]
+  IngredientId int [not null]
+  DisplayOrder int
+  IsRemovable boolean
+  CreatedAt datetime
+}
+
+Table ProductAddons {
+  Id int [pk]
+  ProductId int [not null]
+  AddonId int [not null]
+  DisplayOrder int
+  IsRequired boolean
+  IsActive boolean
+  CreatedAt datetime
+}
+
+Table ProductPromotions {
+  Id int [pk]
+  ProductId int [not null]
+  PromotionId int [not null]
+}
+
+Table Promotions {
+  Id int [pk]
+  Title varchar(200)
+  Description varchar(1000) [null]
+  DiscountType int
+  DiscountValue decimal(18,2)
+  StartDate datetime
+  EndDate datetime
+  IsActive boolean
+  CreatedAt datetime
+}
+
+Table Branches {
+  Id int [pk]
+  Name varchar
+  Address varchar
+  Phone varchar
+  Latitude decimal
+  Longitude decimal
+  IsActive boolean
+  CreatedAt datetime
+}
+
+Table Inventories {
+  Id int [pk]
+  BranchId int [not null]
+  IngredientId int [not null]
+  CurrentQuantity decimal(18,2)
+  MinimumQuantity decimal(18,2)
+  UpdatedAt datetime
+}
+
+Table Orders {
+  Id int [pk]
+  BranchId int [null]
+  CustomerId int [not null]
+  OrderStatusId int [not null]
+  CustomerAddressId int [not null]
+  Subtotal decimal(18,2)
+  DeliveryFees decimal(18,2)
+  TotalPrice decimal(18,2)
+  CustomerConfirmed boolean
+  PlacedAt datetime [null]
+  DeliveredAt datetime [null]
+  CreatedAt datetime
+  UpdatedAt datetime
+}
+
+Table OrderStatus {
+  Id int [pk]
+  DisplayOrder int
+  Status int
+}
+
+Table OrderItems {
+  Id int [pk]
+  OrderId int [not null]
+  ProductId int [not null]
+  ProductName varchar(200)
+  UnitPrice decimal(18,2)
+  Quantity int
+  SpecialInstructions varchar(1000) [null]
+  CreatedAt datetime
+}
+
+Table OrderItemAddons {
+  Id int [pk]
+  OrderItemId int [not null]
+  AddonId int [not null]
+  AddonName varchar(200)
+  UnitPrice decimal(18,2)
+  Quantity int
+  CreatedAt datetime
+}
+
+Table OrderItemIngredients {
+  Id int [pk]
+  OrderItemId int [not null]
+  IngredientId int [not null]
+  IngredientName varchar(200)
+  DisplayOrder int
+  IsRemoved boolean
+  CreatedAt datetime
+}
+
+Table Notifications {
+  Id int [pk]
+  UserId varchar(450) [not null]
+  Title varchar(200)
+  Message varchar(1000)
+  NotificationType int
+  NotificationTarget int
+  ReferenceId int [null]
+  IsRead boolean
+  ReadAt datetime [null]
+  CreatedAt datetime
+}
+
+Ref: RefreshTokens.UserId > AspNetUsers.Id
+Ref: OtpCodes.UserId > AspNetUsers.Id
+Ref: Carts.UserId > AspNetUsers.Id
+Ref: Notifications.UserId > AspNetUsers.Id
+Ref: Comments.UserId > AspNetUsers.Id
+
+Ref: CartItems.CartId > Carts.Id
+Ref: CartItems.ProductId > Products.Id
+Ref: CartItemAddons.CartItemId > CartItems.Id
+Ref: CartItemAddons.ProductAddonId > ProductAddons.Id
+Ref: CartItemRemovedIngredients.CartItemId > CartItems.Id
+Ref: CartItemRemovedIngredients.IngredientId > Ingredients.Id
+
+Ref: Comments.ProductId > Products.Id
+Ref: Products.CategoryId > Categories.Id
+
+Ref: ProductIngredients.ProductId > Products.Id
+Ref: ProductIngredients.IngredientId > Ingredients.Id
+Ref: ProductAddons.ProductId > Products.Id
+Ref: ProductAddons.AddonId > Addons.Id
+Ref: ProductPromotions.ProductId > Products.Id
+Ref: ProductPromotions.PromotionId > Promotions.Id
+
+Ref: Inventories.BranchId > Branches.Id
+Ref: Inventories.IngredientId > Ingredients.Id
+
+Ref: Orders.OrderStatusId > OrderStatus.Id
+Ref: OrderItems.OrderId > Orders.Id
+Ref: OrderItems.ProductId > Products.Id
+Ref: OrderItemAddons.OrderItemId > OrderItems.Id
+Ref: OrderItemAddons.AddonId > Addons.Id
+Ref: OrderItemIngredients.OrderItemId > OrderItems.Id
+Ref: OrderItemIngredients.IngredientId > Ingredients.Id

@@ -28,22 +28,6 @@ public class GoBiteDbContext : IdentityDbContext<ApplicationUser>
         base.OnModelCreating(builder);
 
         builder.ApplyConfigurationsFromAssembly(typeof(AddonConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(CategoryConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(IngredientsConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(InventoryConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(AddonConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(OtpCodeConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(ProductAddonConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(ProductConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(ProductIngredientCofiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(RefreshTokenConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(CartItemConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(CartItemAddonConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(CartItemInfrediantsRemovedConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(OrderItemConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(OrderItemIngredientConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(OrderItemAddonConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(NotificationConfiguration).Assembly);
-        builder.ApplyConfigurationsFromAssembly(typeof(CommentConfiguration).Assembly);
+       
     }
 }
