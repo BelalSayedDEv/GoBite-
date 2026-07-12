@@ -8,7 +8,7 @@ namespace GoBite.Domain.OrderEntities
 
         public int? BranchId { get; set; }
 
-        public int CustomerId { get; set; }
+        public string CustomerId { get; set; }
 
         public int OrderStatusId { get; set; }
 

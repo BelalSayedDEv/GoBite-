@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using GoBite.Application.Contracts;
+using Ardalis.Result;
 using GoBite.Application.DTOs.Auth;
 using GoBite.Application.Interfaces.Rrepository;
 using GoBite.Application.Interfaces.Service;
@@ -32,15 +32,12 @@ public class AuthService : IAuthService
         this.configuration = configuration;
     }
 
-    public async Task<AuthResult> Register(RegisterRequest request)
+    public async Task<Result<AuthResponse>> Register(RegisterRequest request)
     {
         var existingUser = await userManager.FindByEmailAsync(request.Email);
+
         if (existingUser != null)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.EmailAlreadyExists,
-                Message = "Email is already registered"
-            };
+            return Result<AuthResponse>.Conflict();
 
         var user = new ApplicationUser
         {
@@ -53,111 +50,67 @@ public class AuthService : IAuthService
             CreatedAt = DateTime.UtcNow
         };
 
-        var result = await userManager.CreateAsync(user, request.Password);
-        if (!result.Succeeded)
+        var identityResult = await userManager.CreateAsync(user, request.Password);
+
+        if (!identityResult.Succeeded)
         {
-            var errors = result.Errors.Select(e => e.Description).ToList();
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.Unauthorized,
-                Message = "Registration failed",
-                Errors = errors
-            };
+            return Result<AuthResponse>.Error(
+                string.Join(", ", identityResult.Errors.Select(e => e.Description)));
         }
 
         return await GenerateAuthResponse(user);
     }
 
-    public async Task<AuthResult> Login(LoginRequest request)
+    public async Task<Result<AuthResponse>> Login(LoginRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.Unauthorized,
-                Message = "Invalid email or password"
-            };
+            return Result<AuthResponse>.Unauthorized();
 
         if (!user.IsActive)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.Forbidden,
-                Message = "Account is deactivated"
-            };
+            return Result<AuthResponse>.Forbidden();
 
         var found = await userManager.CheckPasswordAsync(user, request.Password);
         if (!found)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.Unauthorized,
-                Message = "Invalid email or password"
-            };
+            return Result<AuthResponse>.Unauthorized();
 
         return await GenerateAuthResponse(user);
     }
 
-    public async Task<AuthResult> Refresh(string userId, RefreshTokenRequest request)
+    public async Task<Result<AuthResponse>> Refresh(string userId, RefreshTokenRequest request)
     {
         var storedToken = await authRepository.GetTokenByToken(request.RefreshToken);
 
         if (storedToken == null)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.TokenNotFound,
-                Message = "Token not found"
-            };
+            return Result<AuthResponse>.NotFound();
 
         if (storedToken.UserId != userId)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.UserNotOwnToken,
-                Message = "Token not found"
-            };
+            return Result<AuthResponse>.NotFound();
 
         if (storedToken.IsUsed)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.TokenUsed,
-                Message = "Token is used"
-            };
+            return Result<AuthResponse>.Conflict();
 
         if (storedToken.IsRevoked)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.TokenRevoked,
-                Message = "Token is revoked"
-            };
+            return Result<AuthResponse>.Conflict();
 
         if (DateTime.UtcNow > storedToken.ExpiresAt)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.TokenExpired,
-                Message = "Token is expired"
-            };
+            return Result<AuthResponse>.Conflict();
 
         storedToken.IsUsed = true;
         storedToken.IsRevoked = true;
 
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.Unauthorized,
-                Message = "User not found"
-            };
+            return Result<AuthResponse>.Unauthorized();
 
         return await GenerateAuthResponse(user);
     }
 
-    public async Task<AuthResult> ForgotPassword(ForgotPasswordRequest request)
+    public async Task<Result<AuthResponse>> ForgotPassword(ForgotPasswordRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.EmailNotFound,
-                Message = "Email not found"
-            };
+            return Result<AuthResponse>.NotFound();
 
         var otp = GenerateOtp();
 
@@ -174,30 +127,18 @@ public class AuthService : IAuthService
 
         await emailService.SendOtpEmailAsync(request.Email, otp);
 
-        return new AuthResult
-        {
-            Outcome = AuthOutcome.Authorized,
-            Message = "OTP sent to your email"
-        };
+        return Result<AuthResponse>.Success(null!);
     }
 
-    public async Task<AuthResult> VerifyOtp(VerifyOtpRequest request)
+    public async Task<Result<AuthResponse>> VerifyOtp(VerifyOtpRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.EmailNotFound,
-                Message = "Email not found"
-            };
+            return Result<AuthResponse>.NotFound();
 
         var validOtp = await authRepository.GetValidOtp(user.Id, request.Otp);
         if (validOtp == null)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.InvalidOtp,
-                Message = "Invalid or expired OTP"
-            };
+            return Result<AuthResponse>.Error("Invalid or expired OTP");
 
         var resetToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
 
@@ -205,22 +146,17 @@ public class AuthService : IAuthService
         validOtp.ResetToken = resetToken;
         await authRepository.Save();
 
-        return new AuthResult
+        return Result<AuthResponse>.Success(new AuthResponse
         {
-            Outcome = AuthOutcome.Authorized,
-            Message = resetToken
-        };
+            AccessToken = resetToken,
+        });
     }
 
-    public async Task<AuthResult> ResetPassword(ResetPasswordRequest request)
+    public async Task<Result<AuthResponse>> ResetPassword(ResetPasswordRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.EmailNotFound,
-                Message = "Email not found"
-            };
+            return Result<AuthResponse>.NotFound();
 
         var identityResetToken = await userManager.GeneratePasswordResetTokenAsync(user);
         var result = await userManager.ResetPasswordAsync(user, identityResetToken, request.NewPassword);
@@ -228,19 +164,10 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
         {
             var errors = result.Errors.Select(e => e.Description).ToList();
-            return new AuthResult
-            {
-                Outcome = AuthOutcome.InvalidResetToken,
-                Message = "Password reset failed",
-                Errors = errors
-            };
+            return Result<AuthResponse>.Error(string.Join(", ", errors));
         }
 
-        return new AuthResult
-        {
-            Outcome = AuthOutcome.Authorized,
-            Message = "Password reset successfully"
-        };
+        return Result<AuthResponse>.Success(null!);
     }
 
     public async Task Logout(string userId)
@@ -249,7 +176,7 @@ public class AuthService : IAuthService
         await authRepository.Save();
     }
 
-    private async Task<AuthResult> GenerateAuthResponse(ApplicationUser user)
+    private async Task<Result<AuthResponse>> GenerateAuthResponse(ApplicationUser user)
     {
         var claims = new List<Claim>
         {
@@ -284,16 +211,12 @@ public class AuthService : IAuthService
         await authRepository.AddRefreshToken(refreshToken);
         await authRepository.Save();
 
-        return new AuthResult
+        return Result<AuthResponse>.Success(new AuthResponse
         {
-            Data = new AuthResponse
-            {
-                AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
-                RefreshToken = refreshToken.Token,
-                Expiration = DateTime.UtcNow.AddMinutes(15),
-            },
-            Outcome = AuthOutcome.Authorized
-        };
+            AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
+            RefreshToken = refreshToken.Token,
+            Expiration = DateTime.UtcNow.AddMinutes(15),
+        });
     }
 
     private static string GenerateOtp()

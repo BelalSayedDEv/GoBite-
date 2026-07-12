@@ -53,4 +53,3 @@ namespace GoBite.Infrastructure.Data.Configurations
         }
     }
 }
-}

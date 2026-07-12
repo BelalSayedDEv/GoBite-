@@ -1,8 +1,7 @@
+using Ardalis.Result;
 using GoBite.API.Model;
-using GoBite.Application.Contracts;
 using GoBite.Application.DTOs.Auth;
 using GoBite.Application.Interfaces.Service;
-using GoBite.Presentation.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -25,13 +24,13 @@ public class AuthController : ControllerBase
     {
         var result = await authService.Register(request);
 
-        if (result.Outcome == AuthOutcome.EmailAlreadyExists)
-            return Conflict(ApiResponse<object>.Failure(result.Message!));
+        if (result.Status == ResultStatus.Conflict)
+            return Conflict(ApiResponse<object>.Failure("Email is already registered"));
 
-        if (result.Outcome == AuthOutcome.Unauthorized)
-            return BadRequest(ApiResponse<object>.Failure(result.Message!, result.Errors));
+        if (result.Status == ResultStatus.Error)
+            return BadRequest(ApiResponse<object>.Failure(string.Join("; ", result.Errors)));
 
-        return Created("", ApiResponse<AuthResponse>.Success(result.Data));
+        return Created("", ApiResponse<AuthResponse>.Success(result.Value));
     }
 
     [HttpPost("login")]
@@ -39,13 +38,13 @@ public class AuthController : ControllerBase
     {
         var result = await authService.Login(request);
 
-        if (result.Outcome == AuthOutcome.Unauthorized)
-            return Unauthorized(ApiResponse<object>.Failure(result.Message!));
+        if (result.Status == ResultStatus.Unauthorized)
+            return Unauthorized(ApiResponse<object>.Failure("Invalid email or password"));
 
-        if (result.Outcome == AuthOutcome.Forbidden)
-            return StatusCode(403, ApiResponse<object>.Failure(result.Message!));
+        if (result.Status == ResultStatus.Forbidden)
+            return StatusCode(403, ApiResponse<object>.Failure("Account is deactivated"));
 
-        return Ok(ApiResponse<AuthResponse>.Success(result.Data));
+        return Ok(ApiResponse<AuthResponse>.Success(result.Value));
     }
 
 
@@ -57,19 +56,13 @@ public class AuthController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await authService.Refresh(userId, request);
 
-        switch (result.Outcome)
-        {
-            case AuthOutcome.TokenNotFound:
-            case AuthOutcome.UserNotOwnToken:
-                return NotFound(ApiResponse<object>.Failure(result.Message!));
+        if (result.Status == ResultStatus.NotFound)
+            return NotFound(ApiResponse<object>.Failure("Token not found"));
 
-            case AuthOutcome.TokenUsed:
-            case AuthOutcome.TokenRevoked:
-            case AuthOutcome.TokenExpired:
-                return Conflict(ApiResponse<object>.Failure(result.Message!));
-        }
+        if (result.Status == ResultStatus.Conflict)
+            return Conflict(ApiResponse<object>.Failure("Token conflict"));
 
-        return Ok(ApiResponse<AuthResponse>.Success(result.Data));
+        return Ok(ApiResponse<AuthResponse>.Success(result.Value));
     }
 
 
@@ -79,12 +72,11 @@ public class AuthController : ControllerBase
     {
         var result = await authService.ForgotPassword(request);
 
-        if (result.Outcome == AuthOutcome.EmailNotFound)
-            return NotFound(ApiResponse<object>.Failure(result.Message!));
+        if (result.Status == ResultStatus.NotFound)
+            return NotFound(ApiResponse<object>.Failure("Email not found"));
 
-        return Ok(ApiResponse<object>.Success(null, result.Message));
+        return Ok(ApiResponse<object>.Success(null, "OTP sent to your email"));
     }
-
 
 
 
@@ -93,15 +85,14 @@ public class AuthController : ControllerBase
     {
         var result = await authService.VerifyOtp(request);
 
-        if (result.Outcome == AuthOutcome.EmailNotFound)
-            return NotFound(ApiResponse<object>.Failure(result.Message!));
+        if (result.Status == ResultStatus.NotFound)
+            return NotFound(ApiResponse<object>.Failure("Email not found"));
 
-        if (result.Outcome == AuthOutcome.InvalidOtp)
-            return BadRequest(ApiResponse<object>.Failure(result.Message!));
+        if (result.Status == ResultStatus.Error)
+            return BadRequest(ApiResponse<object>.Failure(string.Join("; ", result.Errors)));
 
-        return Ok(ApiResponse<object>.Success(null, result.Message));
+        return Ok(ApiResponse<object>.Success(null, result.Value?.AccessToken));
     }
-
 
 
 
@@ -110,15 +101,14 @@ public class AuthController : ControllerBase
     {
         var result = await authService.ResetPassword(request);
 
-        if (result.Outcome == AuthOutcome.EmailNotFound)
-            return NotFound(ApiResponse<object>.Failure(result.Message!));
+        if (result.Status == ResultStatus.NotFound)
+            return NotFound(ApiResponse<object>.Failure("Email not found"));
 
-        if (result.Outcome == AuthOutcome.InvalidResetToken)
-            return BadRequest(ApiResponse<object>.Failure(result.Message!, result.Errors));
+        if (result.Status == ResultStatus.Error)
+            return BadRequest(ApiResponse<object>.Failure(string.Join("; ", result.Errors)));
 
-        return Ok(ApiResponse<object>.Success(null, result.Message));
+        return Ok(ApiResponse<object>.Success(null, "Password reset successfully"));
     }
-
 
 
 

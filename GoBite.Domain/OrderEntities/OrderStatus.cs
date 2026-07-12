@@ -9,6 +9,7 @@ namespace GoBite.Domain.OrderEntities
         public int DisplayOrder { get; set; }
 
         public OrderStatusOptions Status { get; set; }
+        public ICollection<Order> orders = new List<Order>();
 
     }
 }

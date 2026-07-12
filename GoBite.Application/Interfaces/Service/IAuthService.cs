@@ -1,15 +1,15 @@
-using GoBite.Application.Contracts;
+using Ardalis.Result;
 using GoBite.Application.DTOs.Auth;
 
 namespace GoBite.Application.Interfaces.Service;
 
 public interface IAuthService
 {
-    Task<AuthResult> Register(RegisterRequest request);
-    Task<AuthResult> Login(LoginRequest request);
-    Task<AuthResult> Refresh(string userId, RefreshTokenRequest request);
-    Task<AuthResult> ForgotPassword(ForgotPasswordRequest request);
-    Task<AuthResult> VerifyOtp(VerifyOtpRequest request);
-    Task<AuthResult> ResetPassword(ResetPasswordRequest request);
+    Task<Result<AuthResponse>> Register(RegisterRequest request);
+    Task<Result<AuthResponse>> Login(LoginRequest request);
+    Task<Result<AuthResponse>> Refresh(string userId, RefreshTokenRequest request);
+    Task<Result<AuthResponse>> ForgotPassword(ForgotPasswordRequest request);
+    Task<Result<AuthResponse>> VerifyOtp(VerifyOtpRequest request);
+    Task<Result<AuthResponse>> ResetPassword(ResetPasswordRequest request);
     Task Logout(string userId);
 }

@@ -15,6 +15,9 @@ namespace GoBite.Domain.ProductEntities
         public bool IsRequired { get; set; } = false;
 
         public bool IsActive { get; set; } = true;
+        public int MaxQuantity { get; set; }
+
+        public int Price { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
